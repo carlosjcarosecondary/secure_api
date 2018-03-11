@@ -62,7 +62,15 @@ def new_user():
 # Creating a user through curl:
 # curl -i -X POST -H "Content-Type:application/json" -d '{"username":"carlos","password":"abraxas"}' http://localhost:5000/users
 
+# Authenticating with token through curl command:
+# curl -u eyJhbGciOiJIUzI1NiIsImV4cCI6MTUyMDc5MzU3NSwiaWF0IjoxNTIwNzkyOTc1fQ.eyJpZCI6Mn0.P8uB2F4f6lWH3el4fgnoTTd8sOSWQMvjCX_53gR65tA:blank -i -X GET http://localhost:5000/protected_resource
 
+
+@app.route('/protected_resource')
+# This is required to protect a page with login/password
+@auth.login_required
+def get_resource():
+    return jsonify({'data':'Hello %s!'%g.user.username})
 
 
 @app.route('/bagels', methods = ['GET','POST'])
@@ -81,8 +89,6 @@ def showAllBagels():
         session.add(newBagel)
         session.commit()
         return jsonify(newBagel.serialize)
-
-
 
 if __name__ == '__main__':
     app.debug = True
