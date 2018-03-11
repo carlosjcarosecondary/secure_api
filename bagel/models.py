@@ -25,7 +25,7 @@ class User(Base):
 		return pwd_context.verify(password, self.password_hash)
 
 	# Token based authentication
-	def generate_auth_toke(self, expiration=600):
+	def generate_auth_token(self, expiration=600):
 		s = Serializer(secret_key, expires_in = expiration)
 		return s.dumps({'id':self.id})
 

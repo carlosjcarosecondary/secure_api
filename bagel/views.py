@@ -59,6 +59,9 @@ def new_user():
         session.add(user)
         session.commit()
         return jsonify({'username':user.username}), 201
+# Creating a user through curl:
+# curl -i -X POST -H "Content-Type:application/json" -d '{"username":"carlos","password":"abraxas"}' http://localhost:5000/users
+
 
 
 
