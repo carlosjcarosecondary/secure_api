@@ -59,4 +59,4 @@ if __name__ == '__main__':
 
 
 # Testing from command line:
-# curl -u carlos:abraxas -i -X GET http://localhost:5000/prot
+# curl -u carlos:abraxas -i -X GET http://localhost:5000/protected_resource

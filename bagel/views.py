@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request, url_for, abort, g
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
-from flask.ext.httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth
 
 auth = HTTPBasicAuth() 
 
@@ -15,14 +15,34 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 app = Flask(__name__)
 
-#ADD @auth.verify_password here
+#ADD @auth.verify_password here BEFORE Token
+# @auth.verify_password
+# def verify_password(username, password):
+#     user = session.query(User).filter_by(username = username).first()
+#     if not user or not user.verify_password(password):
+#         return False
+#     g.user = user
+#     return True
+
+# With Token
 @auth.verify_password
-def verify_password(username, password):
-    user = session.query(User).filter_by(username = username).first()
-    if not user or not user.verify_password(password):
-        return False
+def verify_password(username_or_token, password):
+    # Try to see if it is a token first
+    user_id = User.verify_auth_token(username_or_token)
+    if user_id:
+        user = session.query(User).filter_by(id = user_id).one()
+    else:
+        user = session.query(User).filter_by(username = username_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
     g.user = user
     return True
+
+@app.route('/token')
+@auth.login_required
+def get_auth_token():
+    token = g.user.generate_auth_token()
+    return jsonify({'token':token.decode('ascii')})
 
 #ADD a /users route here
 @app.route('/users', methods = ['GET', 'POST'])
